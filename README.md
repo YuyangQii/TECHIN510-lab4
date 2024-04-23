@@ -1,5 +1,4 @@
-# TECHIN510-lab4
-##  Accessing Web Resources with Python
+# TECHIN510-lab4:Accessing Web Resources with Python
 
 # 📚🔍 Easy Book Exploration 
 ## Introduction
@@ -22,7 +21,6 @@ Book Explorer is an interactive web application designed for book enthusiasts. I
 
 ## How to Run This Code
 To run this code, open the terminal and execute the following commands:
-
 ```bash
 python -m venv venv
 source venv/bin/activate
@@ -31,10 +29,10 @@ streamlit run app.py
 ```
 
 ## What's Included
-`app.py`: The main Python script with Streamlit code for running the web application.
-`requirements.txt`: A file listing the project's dependencies for easy replication of the environment.
-`db.py`: Script for database interactions, including setting up tables and storing data.
-`book_scraper.py`: Script for scraping book data from web pages.
+- `app.py`: The main Python script with Streamlit code for running the web application.
+- `requirements.txt`: A file listing the project's dependencies for easy replication of the environment.
+- `db.py`: Script for database interactions, including setting up tables and storing data.
+- `-book_scraper.py`: Script for scraping book data from web pages.
 
 ## What I Learned
 - How to effectively scrape web data using Python and manage the scraped data with web techniques and libraries.
