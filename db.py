@@ -1,35 +1,66 @@
-import time
+import os
 import psycopg2
+from dotenv import load_dotenv
 
-class Database:
-    def __init__(self, database_url) -> None:
-        self.con = psycopg2.connect(database_url)
-        self.cur = self.con.cursor()
+load_dotenv()
 
-    def create_table(self):
-        q = """
-        CREATE TABLE IF NOT EXISTS quotes (
-            id SERIAL PRIMARY KEY,
-            content TEXT NOT NULL,
-            author TEXT NOT NULL,
-            tags TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-        """
-        self.cur.execute(q)
-        self.con.commit()
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-    def truncate_table(self):
-        q = """
-        TRUNCATE TABLE quotes
-        """
-        self.cur.execute(q)
-        self.con.commit()
+def get_db_connection():
+    conn = psycopg2.connect(DATABASE_URL)
+    return conn
+
+def create_books_table():
+    conn = get_db_connection()
+    cur = conn.cursor()
     
-    def insert_quote(self, quote):
-        q = """
-        INSERT INTO quotes (content, author, tags) VALUES (%s, %s, %s)
-        """
-        self.cur.execute(q, (quote['content'], quote['author'], quote['tags'],))
-        self.con.commit()
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS books (
+            id SERIAL PRIMARY KEY,
+            title TEXT NOT NULL,
+            price NUMERIC,
+            rating INTEGER,
+            description TEXT
+        );
+    """)
+    
+    conn.commit()  
+    cur.close()
+    conn.close()
+
+def insert_data(data):
+    """向数据库中插入书籍数据"""
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    try:
+        for book in data:
+            cur.execute(
+                "INSERT INTO books (title, price, rating, description) VALUES (%s, %s, %s, %s)",
+                (book['title'], book['price'], book['rating'], book['description'])
+            )
+        conn.commit()  
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        cur.close()
+        conn.close()
+
+def query_books(search_query='', sort_by='title', order='asc'):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    query = f"""
+    SELECT title, price, rating, description FROM books
+    WHERE title ILIKE %s OR description ILIKE %s
+    ORDER BY {sort_by} {order};
+    """
+    cur.execute(query, ('%'+search_query+'%', '%'+search_query+'%'))
+    books = cur.fetchall()
+    cur.close()
+    conn.close()
+    return books
+
+if __name__ == "__main__":
+    create_books_table()  
+    print("Database setup complete.")
